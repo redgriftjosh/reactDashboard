@@ -1,0 +1,14 @@
+[
+    {
+        "user_id": "4826652f-87ec-48ed-aac7-0cad20d18a50",
+        "company_id": 15,
+        "company_name": "testing 2",
+        "role_name": null
+    },
+    {
+        "user_id": "4826652f-87ec-48ed-aac7-0cad20d18a50",
+        "company_id": 16,
+        "company_name": "testing 3",
+        "role_name": "Admin"
+    }
+]
