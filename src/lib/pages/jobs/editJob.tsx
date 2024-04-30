@@ -29,8 +29,22 @@ export default function EditJob() {
 
   const [dateChange, setDateChange] = useState(0);
 
+  const findPreviousStatus = (
+    myWaypoints: Waypoint[],
+    currentIndex: number
+  ) => {
+    for (let i = currentIndex; i > 0; i--) {
+      if (myWaypoints[i - 1].status !== "Undefined") {
+        // Ensure status is not empty or undefined
+        return myWaypoints[i - 1].status;
+      }
+    }
+    return "Undefined"; // Return "undefined" if no previous status is found
+  };
+
   const updateStatuses = (myWaypoints: Waypoint[]) => {
     const updatedWaypoints = myWaypoints.map((waypoint, index) => {
+      const prevStatus = findPreviousStatus(myWaypoints, index);
       const status = calculateStatus({
         targetCompletionDate: waypoint.targetCompletion
           ? new Date(waypoint.targetCompletion)
@@ -38,7 +52,7 @@ export default function EditJob() {
         actualCompletionDate: waypoint.actualCompletion
           ? new Date(waypoint.actualCompletion)
           : null,
-        previousWaypointStatus: myWaypoints[index - 1]?.status,
+        previousWaypointStatus: prevStatus,
       });
       waypoint.status = status;
       return { ...waypoint, status };

@@ -28,7 +28,7 @@ export default function ViewDashboard() {
   // Mock data for the table
   // const headers = ["Waypoint One", "Waypoint Two"];
 
-  const subHeaders = ["Target Completion", "Actual Completion", "Status"];
+  const subHeaders = ["Target", "Actual", "Status"];
 
   // const jobs = [
   //   {
@@ -107,9 +107,9 @@ export default function ViewDashboard() {
           return {
             ...waypoint,
             values: [
-              waypointData.target_completion ?? "Undefined",
-              waypointData.actual_completion ?? "Undefined",
-              "Status",
+              waypointData.target_completion ?? "",
+              waypointData.actual_completion ?? "",
+              waypointData.status ?? "Undefined",
             ],
           };
         } else {
@@ -199,9 +199,44 @@ export default function ViewDashboard() {
     setDashboardName(data[0].dashboard_name);
   };
 
+  const statusColor = (status: string) => {
+    switch (status) {
+      case "At Risk":
+        return "bg-yellow-200 text-yellow-600"; // Yellow for at risk
+      case "In Progress":
+        return "bg-blue-200 text-blue-600"; // Blue for in progress
+      case "LATE":
+        return "bg-red-200 text-red-600"; // Red for late
+      case "Done Late":
+        return "bg-green-200 text-green-600"; // Darker red for done late
+      case "Done":
+        return "bg-green-200 text-green-600"; // Green for done
+      case "Undefined":
+        return "bg-gray-200 text-gray-600";
+      default:
+        return ""; // Default gray
+    }
+  };
+
+  const handleDatabaseChange = () => {
+    getDashboardName();
+    getCompanyWaypoints();
+  };
+
   useEffect(() => {
     getDashboardName();
     getCompanyWaypoints();
+
+    const subscription = supabase
+      .channel("dashboard_waypoints")
+      .on("postgres_changes", { event: "*", schema: "*" }, () => {
+        handleDatabaseChange();
+      })
+      .subscribe();
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   return (
@@ -210,7 +245,9 @@ export default function ViewDashboard() {
         <tbody>
           {/* Main Header */}
           <tr>
-            <td className="border p-1 font-bold text-2xl">{dashboardName}</td>
+            <td className="border p-1 font-bold text-2xl whitespace-nowrap">
+              {dashboardName}
+            </td>
             {headers.map((header, index) => (
               <td
                 key={index}
@@ -223,10 +260,13 @@ export default function ViewDashboard() {
           </tr>
           {/* Subheaders */}
           <tr>
-            <td className="border p-1 font-bold">Job Name</td>
+            <td className="border p-1 font-bold whitespace-nowrap">Job Name</td>
             {headers.map(() =>
               subHeaders.map((subHeader, index) => (
-                <td key={index} className="border p-1 font-bold">
+                <td
+                  key={index}
+                  className="border p-1 font-bold whitespace-nowrap"
+                >
                   {subHeader}
                 </td>
               ))
@@ -239,10 +279,15 @@ export default function ViewDashboard() {
               onClick={() => navigate(`/edit-job?id=${job.id}`)}
               className="cursor-pointer hover:bg-gray-100 transition-all"
             >
-              <td className="border p-1 font-bold">{job.name}</td>
+              <td className="border p-1 font-bold whitespace-nowrap">
+                {job.name}
+              </td>
               {job.waypoints.map((waypoint) =>
                 waypoint.values.map((value, index) => (
-                  <td key={index} className="border p-1 ">
+                  <td
+                    key={index}
+                    className={`border px-2 whitespace-nowrap ${statusColor(value)}`}
+                  >
                     {value}
                   </td>
                 ))

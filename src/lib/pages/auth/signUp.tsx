@@ -51,6 +51,13 @@ export default function SignUp() {
     // insert a new row in tbl_users make the uuid the same as the auth.uid
 
     if (error) {
+      if (error.message.includes("Anonymous sign-ins are disabled")) {
+        alert("Please Enter all fields");
+        return;
+      }
+
+      // duplicate key value violates unique constraint "tbl_users_pkey"
+
       alert(error.message);
       return;
     }
@@ -63,6 +70,14 @@ export default function SignUp() {
       });
 
       if (insertError) {
+        if (
+          insertError.message.includes(
+            'duplicate key value violates unique constraint "tbl_users_pkey"'
+          )
+        ) {
+          alert("Check your email for the confirmation link.");
+          return;
+        }
         alert(insertError.message);
         return;
       } else {

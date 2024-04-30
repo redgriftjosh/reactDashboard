@@ -36,6 +36,15 @@ export default function Dashboards() {
     setDashboards(transformedData);
   };
 
+  const handleEditDashboard = (
+    id: number,
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    navigate(`/edit-dashboard?id=${id}`);
+    event.preventDefault();
+    event.stopPropagation();
+  };
+
   useEffect(() => {
     getDashboards();
   }, []);
@@ -54,7 +63,7 @@ export default function Dashboards() {
             // For opening in a new tab
             key={dashboard.id}
             href={`/view-dashboard?id=${dashboard.id}`}
-            target="_blank"
+            // target="_blank" // Uncomment this line to open in a new tab
             rel="noopener noreferrer"
           >
             <div className="flex items-center p-2 cursor-pointer border rounded-md my-2 hover:shadow-lg hover:my-3 hover:-mx-1 transition-all">
@@ -63,8 +72,8 @@ export default function Dashboards() {
                 <div className="flex items-center">
                   <h2 className="font-bold">{dashboard.name}</h2>
                   <button
-                    onClick={() =>
-                      navigate(`/edit-dashboard?id=${dashboard.id}`)
+                    onClick={(event) =>
+                      handleEditDashboard(dashboard.id, event)
                     }
                   >
                     <PencilSquareIcon className="h-5 w-5 ml-1 text-gray-600 hover:text-indigo-500 hover:h-6 hover:w-6 transition-all" />
