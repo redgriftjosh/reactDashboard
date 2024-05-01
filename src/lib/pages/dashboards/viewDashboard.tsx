@@ -20,15 +20,16 @@ export default function ViewDashboard() {
   const dashboardId = parseInt(searchParams.get("id") ?? "");
   const [jobs, setJobs] = useState<Job[]>([]);
   const [headers, setHeaders] = useState<string[]>([]);
-  // const [subHeaders, setSubHeaders] = useState<string[]>([]);
+  const [subHeaders, setSubHeaders] = useState<string[]>([]);
   const { user } = useUserContext();
   const [dashboardName, setDashboardName] = useState<string>("");
+  // let subHeaders: string[] = [];
   const navigate = useNavigate();
 
   // Mock data for the table
   // const headers = ["Waypoint One", "Waypoint Two"];
 
-  const subHeaders = ["Target", "Actual", "Status"];
+  // const subHeaders = ["Status"];
 
   // const jobs = [
   //   {
@@ -86,8 +87,9 @@ export default function ViewDashboard() {
     return data.map((item) => item.waypoint_id);
   };
 
-  const assignValues = async (jobs: Job[]) => {
+  const assignValues = async (jobs: Job[], subHeaders: string[]) => {
     // Fetch data for all jobs at once if possible, or individually if necessary
+    console.log("assignValues - subHeaders", subHeaders);
     const promises = jobs.map(async (job) => {
       const { data, error } = await supabase
         .from("job_waypoints")
@@ -103,14 +105,22 @@ export default function ViewDashboard() {
       // map through each job's waypoints and assign values
       const updatedWaypoints = job.waypoints.map((waypoint: any) => {
         const waypointData = data.find((w) => w.waypoint_id === waypoint.id);
+        const hasSubHeader = (header: string) => subHeaders?.includes(header);
         if (waypointData) {
+          const tempValues = [];
+          if (hasSubHeader("Target")) {
+            tempValues.push(waypointData.target_completion ?? "");
+          }
+          if (hasSubHeader("Actual")) {
+            tempValues.push(waypointData.actual_completion ?? "");
+          }
+          if (hasSubHeader("Status")) {
+            tempValues.push(waypointData.status ?? "");
+          }
           return {
             ...waypoint,
-            values: [
-              waypointData.target_completion ?? "",
-              waypointData.actual_completion ?? "",
-              waypointData.status ?? "Undefined",
-            ],
+
+            values: tempValues,
           };
         } else {
           // Handle the case where no data was found
@@ -130,7 +140,7 @@ export default function ViewDashboard() {
     // console.log("assignValues: ", jobs);
   };
 
-  const getJobs = async (waypoints: Waypoint[]) => {
+  const getJobs = async (waypoints: Waypoint[], subHeaders: string[]) => {
     const { data, error } = await supabase
       .from("jobs")
       .select("*")
@@ -153,10 +163,10 @@ export default function ViewDashboard() {
     }));
     console.log("getJobs: ", transformedData);
     setJobs(transformedData);
-    assignValues(transformedData);
+    assignValues(transformedData, subHeaders);
   };
 
-  const getCompanyWaypoints = async () => {
+  const getCompanyWaypoints = async (subHeaders: string[]) => {
     const { data, error } = await supabase
       .from("company_waypoints")
       .select("*")
@@ -182,21 +192,23 @@ export default function ViewDashboard() {
       }));
     console.log("transformedData", transformedData);
     setHeaders(transformedData.map((waypoint) => waypoint.name));
-    getJobs(transformedData);
+    getJobs(transformedData, subHeaders);
   };
 
-  const getDashboardName = async () => {
+  const getDashboard = async () => {
     const { data, error } = await supabase
       .from("dashboards")
-      .select("dashboard_name")
+      .select("*")
       .eq("id", dashboardId);
     if (error) {
       alert("An error occurred in getDashboardName: " + error.message);
       return;
     }
-
-    console.log("getDashboardName - data[0]", data[0]);
+    console.log("getDashboard - data[0]", data[0]);
     setDashboardName(data[0].dashboard_name);
+    // const subHeaders = data[0].sub_headers;
+    getCompanyWaypoints(data[0].sub_headers);
+    setSubHeaders(data[0].sub_headers);
   };
 
   const statusColor = (status: string) => {
@@ -219,13 +231,13 @@ export default function ViewDashboard() {
   };
 
   const handleDatabaseChange = () => {
-    getDashboardName();
-    getCompanyWaypoints();
+    getDashboard();
+    // getCompanyWaypoints();
   };
 
   useEffect(() => {
-    getDashboardName();
-    getCompanyWaypoints();
+    getDashboard();
+    // getCompanyWaypoints();
 
     const subscription = supabase
       .channel("dashboard_waypoints")
@@ -252,7 +264,7 @@ export default function ViewDashboard() {
               <td
                 key={index}
                 colSpan={subHeaders.length}
-                className="border p-1 font-bold text-2xl"
+                className="border p-1 font-bold text-2xl whitespace-nowrap"
               >
                 {header}
               </td>

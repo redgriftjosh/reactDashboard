@@ -22,6 +22,15 @@ export default function AddDashboard() {
   const { user } = useUserContext();
   const navigate = useNavigate();
 
+  const [target, setTarget] = useState(true);
+  const [actual, setActual] = useState(true);
+  const [status, setStatus] = useState(true);
+  const [subHeaders, setSubHeaders] = useState<string[]>([
+    "Target",
+    "Actual",
+    "Status",
+  ]);
+
   async function getWaypoints() {
     const { data, error } = await supabase
       .from("company_waypoints")
@@ -67,6 +76,7 @@ export default function AddDashboard() {
           dashboard_name: dashboardName,
           dashboard_description: dashboardDescription,
           company_id: user?.companyId,
+          sub_headers: subHeaders,
         },
       ])
       .select();
@@ -81,6 +91,18 @@ export default function AddDashboard() {
   const handleSubmit = async () => {
     insertDashboard();
   };
+
+  useEffect(() => {
+    console.log("subHeaders", subHeaders);
+  }, [subHeaders]);
+
+  useEffect(() => {
+    const tempSubHeaders = [];
+    if (target) tempSubHeaders.push("Target");
+    if (actual) tempSubHeaders.push("Actual");
+    if (status) tempSubHeaders.push("Status");
+    setSubHeaders(tempSubHeaders);
+  }, [target, actual, status]);
 
   useEffect(() => {
     getWaypoints();
@@ -130,7 +152,63 @@ export default function AddDashboard() {
           </div>
         </div>
 
+        {/* Select Subheaders */}
+        <div className="flex items-center">
+          <div className="mb-4 mr-2">
+            <label
+              htmlFor="dashboardName"
+              className="block text-md font-bold text-gray-700"
+            >
+              Select Columns
+            </label>
+            <div className="flex items-center">
+              <div className="mt-1 w-full border border-gray-300 rounded-md shadow-sm  h-12 px-3 sm:text-md font-bold flex items-center">
+                <h2 className="mr-2">Target</h2>
+                <Switch
+                  checked={target}
+                  onChange={() => setTarget(!target)}
+                  className={`${target ? "bg-indigo-500" : "bg-gray-200"} relative inline-flex items-center h-6 rounded-full w-11 transition-colors focus:outline-none`}
+                >
+                  <span
+                    className={`${target ? "translate-x-6" : "translate-x-1"} inline-block w-4 h-4 transform bg-white rounded-full transition-transform`}
+                  />
+                </Switch>
+              </div>
+              <div className="mt-1 ml-2 w-full border border-gray-300 rounded-md shadow-sm  h-12 px-3 sm:text-md font-bold flex items-center">
+                <h2 className="mr-2">Actual</h2>
+                <Switch
+                  checked={actual}
+                  onChange={() => setActual(!actual)}
+                  className={`${actual ? "bg-indigo-500" : "bg-gray-200"} relative inline-flex items-center h-6 rounded-full w-11 transition-colors focus:outline-none`}
+                >
+                  <span
+                    className={`${actual ? "translate-x-6" : "translate-x-1"} inline-block w-4 h-4 transform bg-white rounded-full transition-transform`}
+                  />
+                </Switch>
+              </div>
+              <div className="mt-1 ml-2 w-full border border-gray-300 rounded-md shadow-sm  h-12 px-3 sm:text-md font-bold flex items-center">
+                <h2 className="mr-2">Status</h2>
+                <Switch
+                  checked={status}
+                  onChange={() => setStatus(!status)}
+                  className={`${status ? "bg-indigo-500" : "bg-gray-200"} relative inline-flex items-center h-6 rounded-full w-11 transition-colors focus:outline-none`}
+                >
+                  <span
+                    className={`${status ? "translate-x-6" : "translate-x-1"} inline-block w-4 h-4 transform bg-white rounded-full transition-transform`}
+                  />
+                </Switch>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Waypoint List */}
+        <label
+          htmlFor="dashboardName"
+          className="block text-md font-bold text-gray-700"
+        >
+          Select Waypoints
+        </label>
         {waypoints.map((waypoint) => (
           <div
             key={waypoint.waypointId}
