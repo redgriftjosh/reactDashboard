@@ -25,16 +25,18 @@ export const useFetchUser = () => {
         } catch (error) {
             console.error('Failed to fetch items:', error);
             setLoading(false);
+        } finally {
+            setLoading(false);
         }
         
     }
 
     async function getUserData() {
-        setLoading(true);
         const { data } = await supabase.auth.getUser();
         if(data.user) {
             getPublicUserData(data.user?.id || "");
         }
+        setLoading(false);
         console.log("dataGetUser", data);
     }
 
