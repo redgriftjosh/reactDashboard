@@ -1,6 +1,5 @@
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../../components/sidebar";
-import { useUserContext } from "../../contexts/userContext";
 import { supabase } from "../../helper/supabaseClient";
 import ProfileIcon from "../../../assets/profileIcon.svg";
 import {
@@ -10,16 +9,18 @@ import {
   CheckIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
-import EditNameModal from "./modals/editNameModal";
 import { useEffect, useState } from "react";
-import CreateCompanyModal from "./modals/createCompanyModal";
+import { useUserContext } from "../../contexts/userContext";
+import { useCompanyContext } from "../../contexts/companyContext";
+import { useFetchUserCompanies } from "../../helper/hooks";
 import SwitchCompanyModal from "./modals/switchCompanyModal";
-import { useAuthContext } from "../../contexts/authContext";
+import CreateCompanyModal from "./modals/createCompanyModal";
+import EditNameModal from "./modals/editNameModal";
 
 export default function Profile() {
-  const { user } = useUserContext();
-  const { setToken } = useAuthContext();
   const navigate = useNavigate();
+  const { user, setUser } = useUserContext();
+  const { company } = useCompanyContext();
 
   const [isModalOpen, setModalOpen] = useState(false); // This is for the edit name modal
   const [isCompanyModalOpen, setCompanyModalOpen] = useState(false); // This is for the create company modal
@@ -28,23 +29,16 @@ export default function Profile() {
   );
   const [switchCompanyName, setSwitchCompanyName] = useState<string>("");
 
-  type Company = {
-    id: number; // Using an ID for key purposes
-    name: string;
-    role?: string;
-  };
-
-  const [companies, setCompanies] = useState<Company[]>();
+  // const [companies, setCompanies] = useState<Company[]>();
 
   // This is handling the log out
   const handleLogOut = async () => {
     const { error } = await supabase.auth.signOut();
-    sessionStorage.removeItem("token");
     if (error) {
       console.log("Error logging out:", error.message);
       return;
     }
-    setToken(false);
+    setUser(null);
     navigate("/login");
   };
 
@@ -60,9 +54,6 @@ export default function Profile() {
   const handleCloseCreateCompany = () => {
     setCompanyModalOpen(false);
   };
-  function handleSetCompanies() {
-    getUserCompanies();
-  }
 
   // Switch Company Modal
   const handleOpenSwitchCompanyModal = (id: number, name: string) => {
@@ -71,35 +62,21 @@ export default function Profile() {
   };
   const handleCloseSwitchCompanyModal = () => setSwitchCompanyModal(null);
 
-  async function getUserCompanies() {
-    const { data, error } = await supabase.rpc("get_user_companies", {
-      user_id_param: user?.id,
-    });
-    if (error) {
-      console.log("Error getUserCompanies", error.message);
-      return;
-    }
-
-    if (data) {
-      console.log("data", data);
-      console.log("user?.id", user?.id);
-      const transformedData = data.map((company: any) => ({
-        id: company.company_id,
-        name: company.company_name,
-        role: company.role_name,
-      }));
-      setCompanies(transformedData);
-      // console.log("companies", companies);
-    }
-  }
-
-  useEffect(() => {
-    // getCompanies();
-    getUserCompanies();
-  }, []);
+  const { companies, setCompanies } = useFetchUserCompanies(user?.id || null);
 
   const listCompanyClass =
     "flex items-center p-2 cursor-pointer border rounded-md my-2 hover:shadow-lg hover:my-3 hover:-mx-1 transition-all";
+
+  useEffect(() => {
+    console.log("companies", companies);
+  }, [companies]);
+
+  // If the first name is not set, the user probably got invited by email and they should set their name
+  useEffect(() => {
+    if (!user?.first_name) {
+      setModalOpen(true);
+    }
+  }, []);
 
   return (
     <Sidebar>
@@ -109,7 +86,7 @@ export default function Profile() {
           <div className="py-0">
             <div className="flex items-center space-x-2">
               <span className="block font-semibold text-lg">
-                {user?.firstName} {user?.lastName}
+                {user?.first_name} {user?.last_name}
               </span>
               <button
                 // Define this function to handle the click event
@@ -134,31 +111,35 @@ export default function Profile() {
           <CreateCompanyModal
             isOpen={isCompanyModalOpen}
             onClose={handleCloseCreateCompany}
-            addCompany={handleSetCompanies}
+            companies={companies}
+            setCompanies={setCompanies}
           />
         </div>
 
         {/* Active Company */}
         <div>
           <h2 className="mt-8 text-2xl font-bold">Active Company</h2>
-          {user?.companyName ? (
+          {user?.active_company_id ? (
             <div
               className={listCompanyClass}
-              onClick={() => navigate(`/edit-company?id=${user?.companyId}`)}
+              onClick={() =>
+                navigate(`/edit-company?id=${user?.active_company_id}`)
+              }
             >
               <CheckIcon className="h-10, w-10 mr-2 stroke-green-500" />
               <div className=" w-full">
-                <h2 className="font-bold">{user?.companyName}</h2>
+                <h2 className="font-bold">{company?.company_name}</h2>
                 <h3 className=" text-sm text-slate-500">No Role</h3>
               </div>
             </div>
           ) : (
-            <div className="flex items-center p-2 cursor-pointer border rounded-md my-2">
-              <XMarkIcon className="h-10, w-10 mr-2" />
+            <div className="flex items-center p-2 border rounded-md my-2">
+              <XMarkIcon className="h-10, w-10 mr-2 text-red-500" />
               <div className=" w-full">
-                <h2 className="font-bold">No Active Company</h2>
-                <h3 className=" text-sm text-slate-500">
-                  Create a New Company or get invited to an existing one.
+                <h2 className="font-bold text-red-500">No Active Company</h2>
+                <h3 className=" text-sm text-red-500">
+                  You need a company to create Dashboards. Create a New Company
+                  or get invited to an existing one to unlock all features!
                 </h3>
               </div>
             </div>
@@ -166,7 +147,7 @@ export default function Profile() {
         </div>
         <h2 className="mt-8 text-2xl font-bold">Available Companies</h2>
         <SwitchCompanyModal
-          isOpen={switchCompanyModal}
+          companyId={switchCompanyModal} // If it's null then the modal is closed
           companyName={switchCompanyName}
           onClose={handleCloseSwitchCompanyModal}
         />
@@ -175,17 +156,20 @@ export default function Profile() {
         <div>
           {companies?.map((company) => (
             <div
-              key={company.id}
+              key={company.company_id}
               className={listCompanyClass}
               onClick={() =>
-                handleOpenSwitchCompanyModal(company.id, company.name)
+                handleOpenSwitchCompanyModal(
+                  company.company_id,
+                  company.company_name
+                )
               }
             >
               <UserGroupIcon className="h-10, w-10 mr-2" />
               <div className=" w-full">
-                <h2 className="font-bold">{company.name}</h2>
+                <h2 className="font-bold">{company.company_name}</h2>
                 <h3 className=" text-sm text-slate-500">
-                  {company.role ? company.role : "No Role"}
+                  {company.role_name ? company.role_name : "No Role"}
                 </h3>
               </div>
             </div>

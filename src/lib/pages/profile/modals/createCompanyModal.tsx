@@ -1,19 +1,22 @@
 import { ChangeEvent, FormEvent, useState } from "react";
-import { supabase } from "../../../helper/supabaseClient";
-import { useUserContext } from "../../../contexts/userContext";
+// import { useUserContext } from "../../../contexts/userContext";
+import { TUserCompany } from "../../../types/types";
+import { useCreateCompany } from "../../../helper/hooks";
 
 type CreateCompanyModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  addCompany: () => void;
+  companies: TUserCompany[] | null;
+  setCompanies: (companies: TUserCompany[] | null) => void;
 };
 
 const CreateCompanyModal: React.FC<CreateCompanyModalProps> = ({
   isOpen,
   onClose,
-  addCompany,
+  companies,
+  setCompanies,
 }) => {
-  const { user } = useUserContext();
+  const createCompany = useCreateCompany();
 
   interface FormState {
     companyName: string;
@@ -37,46 +40,16 @@ const CreateCompanyModal: React.FC<CreateCompanyModalProps> = ({
     console.log("form data", formData);
   };
 
-  async function insertJunctionTable(companyId: number) {
-    const { data, error } = await supabase
-      .from("junction_user_companies")
-      .insert({ company_id: companyId, user_id: user?.id, role_id: 1 })
-      .select();
-    if (error) {
-      alert(error.message);
-    } else {
-      console.log("insertJunctionTable", data);
-
-      // clear formData
-      setFormData({ companyName: "" });
-      onClose();
-    }
-  }
-
-  async function insertCompaniesTable() {
-    const { data, error } = await supabase
-      .from("companies")
-      .insert({ company_name: formData.companyName })
-      .select();
-    if (error) {
-      alert(error.message);
-    } else {
-      console.log("insertCompaniesTable", data);
-      return data[0].id;
-    }
-  }
-
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (formData.companyName === "") {
-      alert("Please enter a company name");
-      return;
+    if (createCompany) {
+      const company = await createCompany(formData.companyName);
+
+      // Update the companies state
+      const newCompanies = [...(companies || []), company] as TUserCompany[]; // Add type assertion here
+      setCompanies(newCompanies);
     }
 
-    const company_id = await insertCompaniesTable();
-
-    await insertJunctionTable(company_id);
-    addCompany();
     setFormData({ companyName: "" });
     onClose();
   }

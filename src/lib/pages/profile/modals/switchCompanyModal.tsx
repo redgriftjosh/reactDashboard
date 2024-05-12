@@ -1,46 +1,29 @@
-import { useUserContext } from "../../../contexts/userContext";
-import { supabase } from "../../../helper/supabaseClient";
+import { useSwitchCompany } from "../../../helper/hooks";
 
 type SwitchCompanyModalProps = {
-  isOpen: number | null;
+  companyId: number | null; // If it's null then the modal is closed
   companyName: string;
   onClose: () => void;
 };
 
 const SwitchCompanyModal: React.FC<SwitchCompanyModalProps> = ({
-  isOpen,
+  companyId,
   companyName,
   onClose,
 }) => {
-  const { setUser } = useUserContext();
+  const switchCompany = useSwitchCompany();
   const handleClose = () => {
     onClose();
   };
 
-  async function handleSwitchCompany() {
-    const { data, error } = await supabase.rpc("switch_users_active_company", {
-      company_id_param: isOpen,
-    });
-    if (error) {
-      alert(error.message);
-      return;
+  const handleSwitchCompany = () => {
+    if (companyId !== null) {
+      switchCompany(companyId);
     }
-    setUser((current: any) => {
-      if (current === null) {
-        throw new Error("User is null");
-      } else {
-        return {
-          ...current,
-          companyId: isOpen,
-          companyName: companyName,
-        };
-      }
-    });
     onClose();
-    console.log(data);
-  }
+  };
 
-  if (!isOpen) return null;
+  if (!companyId) return null;
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center">
       <div className="bg-white p-6 rounded shadow-lg w-1/2 flex flex-col justify-center items-center">

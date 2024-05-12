@@ -23,7 +23,7 @@ export default function Jobs() {
     const { data, error } = await supabase
       .from("jobs")
       .select()
-      .eq("company_id", user?.companyId);
+      .eq("company_id", user?.active_company_id);
     if (error) {
       alert("An error occurred while fetching jobs: " + error.message);
       return;

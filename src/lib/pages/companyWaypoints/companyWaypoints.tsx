@@ -91,7 +91,7 @@ export default function CompanyWaypoints() {
       .from("company_waypoints")
       .insert({
         waypoint_name: newWaypoint,
-        company_id: user?.companyId,
+        company_id: user?.active_company_id,
         order_num: waypoints.length,
       })
       .select();
@@ -118,7 +118,7 @@ export default function CompanyWaypoints() {
     const { data, error } = await supabase
       .from("company_waypoints")
       .select()
-      .eq("company_id", user?.companyId)
+      .eq("company_id", user?.active_company_id)
       .order("order_num", { ascending: true });
 
     if (error) {

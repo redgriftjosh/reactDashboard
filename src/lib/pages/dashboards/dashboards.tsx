@@ -23,7 +23,7 @@ export default function Dashboards() {
     const { data, error } = await supabase
       .from("dashboards")
       .select()
-      .eq("company_id", user?.companyId);
+      .eq("company_id", user?.active_company_id);
     if (error) {
       alert("An error occurred while fetching dashboards: " + error.message);
       return;

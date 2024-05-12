@@ -11,7 +11,7 @@ export const AuthContext = createContext<AuthContext>({} as AuthContext);
 
 // This is the type for the provider props
 type AuthContextProviderProps = {
-  children: ReactNode;
+  children: ReactNode; // This is the children that will be wrapped by the provider
 };
 
 // This is the provider for the context that will wrap the entire app in App.tsx

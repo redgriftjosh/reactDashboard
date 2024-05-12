@@ -90,7 +90,7 @@ export default function EditDashboard() {
     const { data, error } = await supabase
       .from("company_waypoints")
       .select("*")
-      .eq("company_id", user?.companyId)
+      .eq("company_id", user?.active_company_id)
       .order("order_num");
     if (error) {
       alert("An error occurred while fetching waypoints: " + error.message);

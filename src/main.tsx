@@ -1,18 +1,17 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import UserContextProvider from "./lib/contexts/userContext.tsx";
 import App from "./App.tsx";
 import "./index.css";
-import AuthContextProvider from "./lib/contexts/authContext.tsx";
-// import { BrowserRouter } from "react-router-dom";
+import UserContextProvider from "./lib/contexts/userContext.tsx";
+import CompanyContextProvider from "./lib/contexts/companyContext.tsx";
 
 // Hello
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
+  <CompanyContextProvider>
     <UserContextProvider>
-      <AuthContextProvider>
+      <React.StrictMode>
         <App />
-      </AuthContextProvider>
+      </React.StrictMode>
     </UserContextProvider>
-  </React.StrictMode>
+  </CompanyContextProvider>
 );

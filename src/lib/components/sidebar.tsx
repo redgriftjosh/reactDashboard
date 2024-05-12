@@ -3,12 +3,13 @@ import {
   BuildingOffice2Icon,
   SquaresPlusIcon,
 } from "@heroicons/react/24/outline";
-import { useUserContext } from "../contexts/userContext";
 import ProfileIcon from "../../assets/profileIcon.svg";
 import { useNavigate } from "react-router-dom";
+import { useUserContext } from "../contexts/userContext";
+import { useCompanyContext } from "../contexts/companyContext";
 
 // prettier-ignore
-const navigation = [
+let navigation = [
     { name: "Company Waypoints", href: "/company-waypoints", icon: BuildingOffice2Icon },
     { name: "Jobs", href: "/jobs", icon: BriefcaseIcon },
     { name: "Dashboards", href: "/dashboards", icon: SquaresPlusIcon },
@@ -20,11 +21,23 @@ function classNames(...classes: string[]) {
 
 // prettier-ignore
 export default function Sidebar({ children, selected }: { children: React.ReactNode, selected?: "Company Waypoints" | "Jobs" | "Dashboards"}) {
+  // const user = useContext(Context);
   const { user } = useUserContext();
+  const { company } = useCompanyContext();
   const navigate = useNavigate();
   const handleProfileRedirect = () => {
     navigate('/profile');
   };
+
+  if (!company) {
+    navigation = [];
+  } else {
+    navigation = [
+      { name: "Company Waypoints", href: "/company-waypoints", icon: BuildingOffice2Icon },
+      { name: "Jobs", href: "/jobs", icon: BriefcaseIcon },
+      { name: "Dashboards", href: "/dashboards", icon: SquaresPlusIcon },
+    ];
+  }
     return (
       <>
         <div>
@@ -34,8 +47,13 @@ export default function Sidebar({ children, selected }: { children: React.ReactN
               <div className="py-1 flex items-center" onClick={handleProfileRedirect} style={{ cursor: 'pointer' }}>
                 <img src={ProfileIcon} alt="Profile" className="h-10 w-10 mr-2" />
                 <div className="py-1">
-                  <span className="block font-semibold">Hello, {user?.firstName}</span>
-                  <span className="block text-gray-600 font-semibold text-sm">{user?.companyName ?? "No Company Ltd."}</span>
+                  <span className="block font-semibold">Hello, {user?.first_name}</span>
+                  {/* <span className="block text-gray-600 font-semibold text-sm">{company?.company_name ?? "No Company!"}</span> */}
+                  <span 
+                    style={{ color: company?.company_name ? 'inherit' : 'red' }}
+                    className="block font-semibold text-sm text-gray-600">
+                    {company?.company_name ?? "No Company!"}
+                  </span>
                 </div>
               </div>
               <nav className="flex flex-1 flex-col">

@@ -56,12 +56,6 @@ export default function EditJob() {
       });
       waypoint.status = status;
       return { ...waypoint, status };
-      console.log(" ");
-      console.log("updateStatuses: ", waypoint.waypointName);
-      console.log("targetCompletionDate: ", waypoint.targetCompletion);
-      console.log("actualCompletionDate: ", waypoint.actualCompletion);
-      console.log("previousWaypointStatus: ", myWaypoints[index - 1]?.status);
-      console.log("calculateStatus: ", status);
     });
 
     setWaypoints(updatedWaypoints);
@@ -98,6 +92,7 @@ export default function EditJob() {
   const updateJobWaypoints = async () => {
     // Prepare batch operations
     const operations = waypoints.map((waypoint) => {
+      // Upsert is important! What if a user adds a job but then adds a waypoint to the company??? You every think about that, Big Dog?
       return supabase.from("job_waypoints").upsert(
         {
           id: waypoint.jobWaypointId,
@@ -141,7 +136,7 @@ export default function EditJob() {
     const { data, error } = await supabase
       .from("company_waypoints")
       .select("*")
-      .eq("company_id", user?.companyId)
+      .eq("company_id", user?.active_company_id)
       .order("order_num");
     if (error) {
       alert("An error occurred while fetching waypoints: " + error.message);
@@ -302,29 +297,6 @@ export default function EditJob() {
             </div>
           </div>
         ))}
-
-        {/* Waypoint List */}
-        {/* {waypoints.map((waypoint) => (
-          <div
-            key={waypoint.waypointId}
-            className="flex items-center p-2 border rounded-md my-2 justify-center"
-          >
-            <h2 className="font-bold mr-2">{waypoint.waypointName}</h2>
-            <div>
-              <div className=" border inline-flex items-center">
-                <DatePicker
-                  selected={waypoint.date}
-                  onChange={(date: Date | null) =>
-                    handleDateChange(waypoint.waypointId, date)
-                  }
-                  isClearable={true}
-                  showMonthDropdown={true}
-                  dateFormat="MMM dd, yyyy"
-                />
-              </div>
-            </div>
-          </div>
-        ))} */}
 
         {/* Save Button */}
         <div className="flex justify-center">

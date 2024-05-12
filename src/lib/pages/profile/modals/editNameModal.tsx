@@ -23,8 +23,8 @@ const EditNameModal: React.FC<EditNameModalProps> = ({ isOpen, onClose }) => {
   useEffect(() => {
     if (user) {
       setFormData({
-        firstName: user.firstName,
-        lastName: user.lastName,
+        firstName: user.first_name || "",
+        lastName: user.last_name || "",
       });
       //   console.log("User", user);
     }
@@ -52,19 +52,16 @@ const EditNameModal: React.FC<EditNameModalProps> = ({ isOpen, onClose }) => {
     if (error) {
       alert(error.message);
     } else {
-      setUser((current) => {
-        if (current === null) {
-          // Handle the case where there is no current user data
-          return null;
-        } else {
-          // Safely update lastName while preserving other properties
-          return {
-            ...current,
-            firstName: formData.firstName,
-            lastName: formData.lastName,
-          };
-        }
-      });
+      if (!user) return;
+      const newUser = {
+        id: user?.id,
+        created_at: user?.created_at,
+        first_name: formData.firstName,
+        last_name: formData.lastName,
+        email: user?.email,
+        active_company_id: user?.active_company_id,
+      };
+      setUser(newUser);
       onClose();
     }
   }

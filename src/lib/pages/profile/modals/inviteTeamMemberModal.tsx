@@ -1,6 +1,6 @@
 import { ChangeEvent, useState } from "react";
 import { supabase } from "../../../helper/supabaseClient";
-import { useUserContext } from "../../../contexts/userContext";
+import { useCompanyContext } from "../../../contexts/companyContext";
 
 type InviteTeamMemberModalProps = {
   isOpen: boolean;
@@ -11,7 +11,7 @@ const InviteTeamMemberModal: React.FC<InviteTeamMemberModalProps> = ({
   isOpen,
   onClose,
 }) => {
-  const { user } = useUserContext();
+  const { company } = useCompanyContext();
   interface FormState {
     email: string;
   }
@@ -28,6 +28,25 @@ const InviteTeamMemberModal: React.FC<InviteTeamMemberModalProps> = ({
     }));
     // console.log("form data", formData);
   };
+
+  async function inviteUserByEmail(email: string) {
+    const { data, error } = await supabase.auth.admin.inviteUserByEmail(email);
+    if (error) alert("Error inviting user: " + error.message);
+    console.log("data", data);
+    if (data.user) {
+      await supabase.from("users").insert({
+        id: data.user.id,
+        email: formData.email,
+        active_company_id: company?.id,
+      });
+
+      await supabase.from("junction_user_companies").insert({
+        company_id: company?.id,
+        user_id: data.user.id,
+        role_id: 2,
+      });
+    }
+  }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -48,7 +67,7 @@ const InviteTeamMemberModal: React.FC<InviteTeamMemberModalProps> = ({
       const { error: insertError } = await supabase
         .from("junction_user_companies")
         .insert({
-          company_id: user?.companyId,
+          company_id: company?.id,
           user_id: data[0].id,
           role_id: 2,
         });
@@ -64,8 +83,12 @@ const InviteTeamMemberModal: React.FC<InviteTeamMemberModalProps> = ({
     } else if (data.length > 1) {
       alert("Multiple users found with that email");
     } else {
-      alert("User not found");
+      console.log(
+        "No user found with that email. Gonna try sending an invite email."
+      );
+      await inviteUserByEmail(formData.email);
     }
+    onClose();
   }
 
   if (!isOpen) return null;

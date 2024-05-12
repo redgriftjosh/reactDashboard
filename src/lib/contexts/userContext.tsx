@@ -1,28 +1,13 @@
-import React, {
-  createContext,
-  useState,
-  ReactNode,
-  useContext,
-  useEffect,
-} from "react";
-import { supabase } from "../helper/supabaseClient";
-
-type User = {
-  id: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  companyId?: number;
-  companyName?: string;
-};
+import { createContext, useState, ReactNode, useContext } from "react";
+import { TUser } from "../types/types";
 
 type UserContextProviderProps = {
   children: ReactNode;
 };
 
 type UserContext = {
-  user: User | null;
-  setUser: React.Dispatch<React.SetStateAction<User | null>>;
+  user: TUser | null;
+  setUser: (user: TUser | null) => void;
 };
 
 export const UserContext = createContext<UserContext | null>(null);
@@ -31,46 +16,7 @@ export const UserContext = createContext<UserContext | null>(null);
 export default function UserContextProvider({
   children,
 }: UserContextProviderProps) {
-  const [user, setUser] = useState<User | null>(() => {
-    const savedUserData = localStorage.getItem("user");
-    return savedUserData ? JSON.parse(savedUserData) : null;
-  });
-
-  // Listen for changes to the user in the database and update the context
-  const subscription = supabase
-    .channel("user")
-    .on(
-      "postgres_changes",
-      {
-        event: "UPDATE",
-        schema: "public",
-        table: "users",
-      },
-      (payload) => {
-        setUser({
-          id: payload.new.id,
-          email: payload.new.email,
-          firstName: payload.new.first_name,
-          lastName: payload.new.last_name,
-        });
-      }
-    )
-    .subscribe();
-
-  // Update localStorage whenever the user changes
-  useEffect(() => {
-    if (user) {
-      localStorage.setItem("user", JSON.stringify(user));
-      console.log("user", user);
-    } else {
-      localStorage.removeItem("user");
-    }
-
-    // Stop listening when the component unmounts
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [user]);
+  const [user, setUser] = useState<TUser | null>(null);
 
   // Provide the user context to its children
   return (

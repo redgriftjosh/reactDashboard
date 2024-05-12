@@ -6,6 +6,8 @@ import { supabase } from "../../helper/supabaseClient";
 import ProfileIcon from "../../../assets/profileIcon.svg";
 import { PlusIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import InviteTeamMemberModal from "./modals/inviteTeamMemberModal";
+import { useCompanyContext } from "../../contexts/companyContext";
+import DeleteCompanyModal from "./modals/deleteCompanyModal";
 
 type Teammate = {
   teammateId: string;
@@ -20,9 +22,12 @@ export default function EditCompany() {
   const companyId = parseInt(searchParams.get("id") ?? "");
   const navigate = useNavigate();
   const { user } = useUserContext();
+  const { company } = useCompanyContext();
   const [teammates, setTeammates] = useState<Teammate[]>();
   const [isInviteTeamMemberModalOpen, setInviteTeamMemberModalOpen] =
     useState(false); // This is for the invite team member modal
+
+  const [isDeleteCompanyModalOpen, setDeleteCompanyModalOpen] = useState(false);
 
   async function getUsers() {
     const { data, error } = await supabase.rpc("get_company_users", {
@@ -45,18 +50,20 @@ export default function EditCompany() {
     console.log("teammates", teammates);
   }
 
+  const handleCloseCreateCompany = () => setDeleteCompanyModalOpen(false);
+
   const handleOpenInviteTeamMember = () => {
     setInviteTeamMemberModalOpen(true);
   };
 
   useEffect(() => {
-    if (companyId !== user?.companyId) {
+    if (companyId !== user?.active_company_id) {
       console.log("You can't edit this company");
       navigate("/profile");
     }
 
     getUsers();
-  }, []);
+  }, [isInviteTeamMemberModalOpen]);
 
   if (!user) return;
   return (
@@ -64,7 +71,7 @@ export default function EditCompany() {
       <div className=" p-8">
         <div className="flex">
           <div className="w-full">
-            <h2 className=" text-4xl font-bold">{user.companyName}</h2>
+            <h2 className=" text-4xl font-bold">{company?.company_name}</h2>
             <p>Edit company</p>
           </div>
           <button
@@ -85,7 +92,9 @@ export default function EditCompany() {
           >
             <img src={ProfileIcon} alt="Profile" className="h-10 w-10 mr-2" />
             <div className=" w-full">
-              <h2 className="font-bold">{teammate.firstName}</h2>
+              <h2 className="font-bold">
+                {teammate.firstName ?? `Account Pending: ${teammate.email}`}
+              </h2>
               <h3 className=" text-sm text-slate-500">{teammate.role}</h3>
             </div>
           </div>
@@ -104,6 +113,19 @@ export default function EditCompany() {
         <InviteTeamMemberModal
           isOpen={isInviteTeamMemberModalOpen}
           onClose={() => setInviteTeamMemberModalOpen(false)}
+        />
+
+        {/* Delete Company Button */}
+        <button
+          type="button"
+          className="mt-8 bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+          onClick={() => setDeleteCompanyModalOpen(true)}
+        >
+          Permanently Delete Company
+        </button>
+        <DeleteCompanyModal
+          isOpen={isDeleteCompanyModalOpen}
+          onClose={handleCloseCreateCompany}
         />
       </div>
     </Sidebar>

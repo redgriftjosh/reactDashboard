@@ -1,23 +1,13 @@
-import React, {
-  createContext,
-  useState,
-  ReactNode,
-  useContext,
-  useEffect,
-} from "react";
-
-type Company = {
-  id: number;
-  companyName: string;
-};
+import React, { createContext, useState, ReactNode, useContext } from "react";
+import { TCompany } from "../types/types";
 
 type CompanyContextProviderProps = {
   children: ReactNode;
 };
 
 type CompanyContext = {
-  company: Company | null;
-  setCompany: React.Dispatch<React.SetStateAction<Company | null>>;
+  company: TCompany | null;
+  setCompany: React.Dispatch<React.SetStateAction<TCompany | null>>;
 };
 
 export const CompanyContext = createContext<CompanyContext | null>(null);
@@ -25,19 +15,7 @@ export const CompanyContext = createContext<CompanyContext | null>(null);
 export default function CompanyContextProvider({
   children,
 }: CompanyContextProviderProps) {
-  const [company, setCompany] = useState<Company | null>(() => {
-    const savedUserData = localStorage.getItem("company");
-    return savedUserData ? JSON.parse(savedUserData) : null;
-  });
-
-  // Update localStorage whenever the user changes
-  useEffect(() => {
-    if (company) {
-      localStorage.setItem("company", JSON.stringify(company));
-    } else {
-      localStorage.removeItem("company");
-    }
-  }, [company]);
+  const [company, setCompany] = useState<TCompany | null>(null);
 
   return (
     <CompanyContext.Provider value={{ company, setCompany }}>
