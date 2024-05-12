@@ -35,8 +35,9 @@ export const useFetchUser = () => {
         const { data } = await supabase.auth.getUser();
         if(data.user) {
             getPublicUserData(data.user?.id || "");
+        } else {
+            setLoading(false);
         }
-        setLoading(false);
         console.log("dataGetUser", data);
     }
 
