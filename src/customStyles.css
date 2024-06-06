@@ -1,0 +1,45 @@
+/* customStyles.css */
+.bg-yellow-custom {
+    background-color: #FCE8B2;
+  }
+  
+  .text-yellow-custom {
+    color: #BF9002;
+  }
+  
+  .bg-blue-custom {
+    background-color: #A4C2F4;
+  }
+  
+  .text-blue-custom {
+    color: #1255CC;
+  }
+  
+  .bg-red-custom {
+    background-color: #F4C7C3;
+  }
+  
+  .text-red-custom {
+    color: #990001;
+  }
+  
+  .bg-green-custom {
+    background-color: #B6E1CD;
+  }
+  
+  .text-green-custom {
+    color: #38761D;
+  }
+  
+  .bg-gray-custom {
+    background-color: #B7B7B7;
+  }
+  
+  .text-gray-custom {
+    color: #434343;
+  }
+
+  .custom-table-border {
+    border: 2px solid #00000024; /* Adjust the color and thickness as needed */
+  }
+  

@@ -18,6 +18,7 @@ import Dashboards from "./lib/pages/dashboards/dashboards";
 import EditDashboard from "./lib/pages/dashboards/editDashboard";
 import AddDashboard from "./lib/pages/dashboards/addDashboard";
 import ViewDashboard from "./lib/pages/dashboards/viewDashboard";
+import "./customStyles.css";
 
 //prettier-ignore
 const App = () => {

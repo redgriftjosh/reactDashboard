@@ -211,20 +211,21 @@ export default function ViewDashboard() {
     setSubHeaders(data[0].sub_headers);
   };
 
+  // Pulling these colours directly from customStyles.css
   const statusColor = (status: string) => {
     switch (status) {
       case "At Risk":
-        return "bg-yellow-200 text-yellow-600"; // Yellow for at risk
+        return "bg-yellow-custom text-yellow-custom"; // Yellow for at risk
       case "In Progress":
-        return "bg-blue-200 text-blue-600"; // Blue for in progress
+        return "bg-blue-custom text-blue-custom"; // Blue for in progress
       case "LATE":
-        return "bg-red-200 text-red-600"; // Red for late
+        return "bg-red-custom text-red-custom"; // Red for late
       case "Done Late":
-        return "bg-green-200 text-green-600"; // Darker red for done late
+        return "bg-green-custom text-green-custom"; // Darker red for done late
       case "Done":
-        return "bg-green-200 text-green-600"; // Green for done
+        return "bg-green-custom text-green-custom"; // Green for done
       case "Undefined":
-        return "bg-gray-200 text-gray-600";
+        return "bg-gray-custom text-gray-custom";
       default:
         return ""; // Default gray
     }
@@ -257,14 +258,14 @@ export default function ViewDashboard() {
         <tbody>
           {/* Main Header */}
           <tr>
-            <td className="border p-1 font-bold text-2xl whitespace-nowrap">
+            <td className="border p-1 font-bold text-2xl whitespace-nowrap custom-table-border">
               {dashboardName}
             </td>
             {headers.map((header, index) => (
               <td
                 key={index}
                 colSpan={subHeaders.length}
-                className="border p-1 font-bold text-2xl whitespace-nowrap"
+                className="border p-1 font-bold text-2xl whitespace-nowrap custom-table-border"
               >
                 {header}
               </td>
@@ -272,12 +273,14 @@ export default function ViewDashboard() {
           </tr>
           {/* Subheaders */}
           <tr>
-            <td className="border p-1 font-bold whitespace-nowrap">Job Name</td>
+            <td className="border p-1 font-bold whitespace-nowrap custom-table-border">
+              Job Name
+            </td>
             {headers.map(() =>
               subHeaders.map((subHeader, index) => (
                 <td
                   key={index}
-                  className="border p-1 font-bold whitespace-nowrap"
+                  className="border p-1 font-bold whitespace-nowrap custom-table-border"
                 >
                   {subHeader}
                 </td>
@@ -291,14 +294,14 @@ export default function ViewDashboard() {
               onClick={() => navigate(`/edit-job?id=${job.id}`)}
               className="cursor-pointer hover:bg-gray-100 transition-all"
             >
-              <td className="border p-1 font-bold whitespace-nowrap">
+              <td className="border p-1 font-bold whitespace-nowrap custom-table-border">
                 {job.name}
               </td>
               {job.waypoints.map((waypoint) =>
                 waypoint.values.map((value, index) => (
                   <td
                     key={index}
-                    className={`border px-2 whitespace-nowrap ${statusColor(value)}`}
+                    className={`border px-2 whitespace-nowrap ${statusColor(value)} custom-table-border`}
                   >
                     {value}
                   </td>
