@@ -17,7 +17,7 @@ import AddJob from "./lib/pages/jobs/addJob";
 import Dashboards from "./lib/pages/dashboards/dashboards";
 import EditDashboard from "./lib/pages/dashboards/editDashboard";
 import AddDashboard from "./lib/pages/dashboards/addDashboard";
-import ViewDashboard from "./lib/pages/dashboards/viewDashboard";
+// import ViewDashboard from "./lib/pages/dashboards/viewDashboard";
 import "./customStyles.css";
 import ViewDashboard1 from "./lib/pages/dashboards/viewDashboard copy";
 
