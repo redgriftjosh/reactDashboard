@@ -25,6 +25,8 @@ const App = () => {
   const { user, loading } = useFetchUser();
   useFetchCompany();
 
+  console.log("Redirect", import.meta.env.VITE_EMAIL_REDIRECT_URL as string);
+
   // Without this, the user will see a flash of the login page before being redirected to the profile page when they refresh.
   // Even if they're not on the profile page so it's annoying.
   if (loading) {

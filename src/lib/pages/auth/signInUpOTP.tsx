@@ -14,7 +14,9 @@ export default function SignInUpOTP() {
     const { data, error } = await supabase.auth.signInWithOtp({
       email: email,
       options: {
-        emailRedirectTo: "http://tpi-3-dashboard.com/",
+        // emailRedirectTo: "http://tpi-3-dashboard.com/",
+        // emailRedirectTo: "http://localhost:5173/",
+        emailRedirectTo: import.meta.env.VITE_EMAIL_REDIRECT_TO,
       },
     });
     console.log(data, error);
@@ -22,6 +24,14 @@ export default function SignInUpOTP() {
       alert("Error logging in: " + error.message);
       return;
     } else {
+      // if (data.user) {
+      //   await supabase.from("users").insert({
+      //     id: data.user.id,
+      //     first_name: formData.firstName,
+      //     last_name: formData.lastName,
+      //     email: formData.email,
+      //   });
+      // }
       setSuccess(true);
     }
   }

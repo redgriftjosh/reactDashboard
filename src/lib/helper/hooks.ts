@@ -9,18 +9,46 @@ export const useFetchUser = () => {
     const { user, setUser } = useUserContext();
     const [loading, setLoading] = useState<boolean>(true);
 
-    async function getPublicUserData(userId: string) {
+    async function insertPublicUser(user: any) {
+        const { data, error } = await supabase
+            .from("users")
+            .insert([{ id: user.id, email: user.email }])
+            .select();
+        if (error) {
+            // Check if error is due to duplicate entry
+            if (error.code === '23505') {
+                console.log('User already exists in public.users');
+            } else {
+                alert("Error Creating Public User Row: " + error.message);
+                throw error;
+            }
+        } else {
+            console.log("insertPublicUser", data);
+            setUser(data[0]);
+            setLoading(false);
+            return user;
+        }
+    }
+
+    async function getPublicUserData(user: any) {
         const { data, error } = await supabase
             .from("users")
             .select("*")
-            .eq("id", userId);
+            .eq("id", user.id);
+        // console.log("getPublicUserData", userId);
         if (error) console.error("Error getting public user data", error.message);
         // if (data) setUser(data[0]);
         try {
-            if (data) {
+            if (data && data?.length > 0) {
+                console.log("THERE IS DATA", data);
                 setUser(data[0]);
                 setLoading(false);
                 return user;
+            } else {
+                console.log("THERE IS NO DATA", data);
+                console.log("user", user);
+                insertPublicUser(user);
+                
             }
         } catch (error) {
             console.error('Failed to fetch items:', error);
@@ -34,7 +62,7 @@ export const useFetchUser = () => {
     async function getUserData() {
         const { data } = await supabase.auth.getUser();
         if(data.user) {
-            getPublicUserData(data.user?.id || "");
+            getPublicUserData(data.user);
         } else {
             setLoading(false);
         }
@@ -42,7 +70,7 @@ export const useFetchUser = () => {
     }
 
     useEffect(() => {
-        console.log("userUseEffect", user);
+        // console.log("userUseEffect", user);
 
     }, [user]);
 

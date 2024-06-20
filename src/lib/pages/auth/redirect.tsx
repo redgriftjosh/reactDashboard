@@ -10,6 +10,7 @@ const RedirectComponent = () => {
     const { session } = data; // const { session, user } = data;
     navigate(session ? "/profile" : "/login");
 
+    // console.log("refreshSession() Session", session);
     if (error) console.error("Session error", error.message);
   }
 
