@@ -19,13 +19,14 @@ import EditDashboard from "./lib/pages/dashboards/editDashboard";
 import AddDashboard from "./lib/pages/dashboards/addDashboard";
 import ViewDashboard from "./lib/pages/dashboards/viewDashboard";
 import "./customStyles.css";
+import ViewDashboard1 from "./lib/pages/dashboards/viewDashboard copy";
 
 //prettier-ignore
 const App = () => {
   const { user, loading } = useFetchUser();
   useFetchCompany();
 
-  console.log("Redirect", import.meta.env.VITE_EMAIL_REDIRECT_URL as string);
+  // console.log("Redirect", import.meta.env.VITE_EMAIL_REDIRECT_URL);
 
   // Without this, the user will see a flash of the login page before being redirected to the profile page when they refresh.
   // Even if they're not on the profile page so it's annoying.
@@ -50,7 +51,7 @@ const App = () => {
         <Route path="/dashboards" element={user ? <Dashboards /> : <Navigate to="/login" replace />} />
         <Route path="/edit-dashboard" element={user ? <EditDashboard /> : <Navigate to="/login" replace />} />
         <Route path="/add-dashboard" element={user ? <AddDashboard /> : <Navigate to="/login" replace />} />
-        <Route path="/view-dashboard" element={user ? <ViewDashboard /> : <Navigate to="/login" replace />} />
+        <Route path="/view-dashboard" element={user ? <ViewDashboard1 /> : <Navigate to="/login" replace />} />
 
         <Route path="*" element={<NotFound />} />
       </Routes>

@@ -169,19 +169,30 @@ export default function EditJob() {
       return;
     }
 
+    console.log("Job Waypoints: ", data);
+
     // set the date for each waypoint
     const updatedWaypoints = companyWaypoints.map((waypoint) => {
       const waypointData = data.find(
         (jobWaypoint: any) => jobWaypoint.waypoint_id === waypoint.waypointId
       );
+
+      // const targetCompletion = waypointData?.target_completion
+      //   ? new Date(waypointData?.target_completion + "T00:00:00")
+      //   : null;
       return {
         ...waypoint,
         jobWaypointId: waypointData?.id,
-        targetCompletion: waypointData?.target_completion,
-        actualCompletion: waypointData?.actual_completion,
-        status: waypointData?.status,
+        targetCompletion: waypointData?.target_completion
+          ? new Date(waypointData?.target_completion + "T00:00:00")
+          : null,
+        actualCompletion: waypointData?.actual_completion
+          ? new Date(waypointData?.actual_completion + "T00:00:00")
+          : null,
+        // status: waypointData?.status,
       };
     });
+    console.log("Updated Waypoints: ", updatedWaypoints);
     setWaypoints(updatedWaypoints);
     updateStatuses(updatedWaypoints);
   }

@@ -23,7 +23,7 @@ export const useFetchUser = () => {
                 throw error;
             }
         } else {
-            console.log("insertPublicUser", data);
+            // console.log("insertPublicUser", data);
             setUser(data[0]);
             setLoading(false);
             return user;
@@ -40,13 +40,13 @@ export const useFetchUser = () => {
         // if (data) setUser(data[0]);
         try {
             if (data && data?.length > 0) {
-                console.log("THERE IS DATA", data);
+                // console.log("THERE IS DATA", data);
                 setUser(data[0]);
                 setLoading(false);
                 return user;
             } else {
-                console.log("THERE IS NO DATA", data);
-                console.log("user", user);
+                // console.log("THERE IS NO DATA", data);
+                // console.log("user", user);
                 insertPublicUser(user);
                 
             }
@@ -66,7 +66,7 @@ export const useFetchUser = () => {
         } else {
             setLoading(false);
         }
-        console.log("dataGetUser", data);
+        // console.log("dataGetUser", data);
     }
 
     useEffect(() => {
