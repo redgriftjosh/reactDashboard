@@ -16,7 +16,7 @@ export default function SignInUpOTP() {
       options: {
         // emailRedirectTo: "http://tpi-3-dashboard.com/",
         // emailRedirectTo: "http://localhost:5173/",
-        emailRedirectTo: import.meta.env.VITE_EMAIL_REDIRECT_TO,
+        emailRedirectTo: import.meta.env.VITE_EMAIL_REDIRECT_URL,
       },
     });
     console.log(data, error);
