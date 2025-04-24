@@ -71,14 +71,14 @@
 //       const getUserData = await getUser(data.user.id); // Await the getUser function to get the companyId
 //       const companyName = await getCompanyName(getUserData.active_company_id); // Await the getCompanyName function to get the companyName
 //       setToken(true);
-//       // setUser({
-//       //   id: data.user.id,
-//       //   email: data.user.email ?? "",
-//       //   firstName: getUserData.first_name,
-//       //   lastName: getUserData.last_name,
-//       //   companyId: getUserData.active_company_id,
-//       //   companyName: companyName,
-//       // });
+//       setUser({
+//         id: data.user.id,
+//         email: data.user.email ?? "",
+//         first_name: getUserData.first_name,
+//         last_name: getUserData.last_name,
+//         active_company_id: getUserData.active_company_id,
+//         companyName: companyName,
+//       });
 //       navigate("/profile"); // Redirect after successful login
 //     }
 //     // console.log(data, error);

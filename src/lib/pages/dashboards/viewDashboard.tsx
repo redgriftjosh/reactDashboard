@@ -91,10 +91,7 @@ export default function ViewDashboard() {
     // Fetch data for all jobs at once if possible, or individually if necessary
     console.log("assignValues - subHeaders", subHeaders);
     const promises = jobs.map(async (job) => {
-      const { data, error } = await supabase
-        .from("job_waypoints")
-        .select("*")
-        .eq("job_id", job.id);
+      const { data, error } = await supabase.from("job_waypoints").select("*").eq("job_id", job.id);
       if (error) {
         console.error("An error occurred in assignValues:", error.message);
         return job; // return job unmodified if there's an error
@@ -196,10 +193,7 @@ export default function ViewDashboard() {
   };
 
   const getDashboard = async () => {
-    const { data, error } = await supabase
-      .from("dashboards")
-      .select("*")
-      .eq("id", dashboardId);
+    const { data, error } = await supabase.from("dashboards").select("*").eq("id", dashboardId);
     if (error) {
       alert("An error occurred in getDashboardName: " + error.message);
       return;
@@ -273,9 +267,7 @@ export default function ViewDashboard() {
           </tr>
           {/* Subheaders */}
           <tr>
-            <td className="border p-1 font-bold whitespace-nowrap custom-table-border">
-              Job Name
-            </td>
+            <td className="border p-1 font-bold whitespace-nowrap custom-table-border">Job Name</td>
             {headers.map(() =>
               subHeaders.map((subHeader, index) => (
                 <td
@@ -284,7 +276,7 @@ export default function ViewDashboard() {
                 >
                   {subHeader}
                 </td>
-              ))
+              )),
             )}
           </tr>
           {/* Rows */}
@@ -305,7 +297,7 @@ export default function ViewDashboard() {
                   >
                     {value}
                   </td>
-                ))
+                )),
               )}
             </tr>
           ))}
