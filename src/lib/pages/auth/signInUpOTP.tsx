@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { supabase } from "../../helper/supabaseClient";
+import LogIn from "./logIn";
 
 export default function SignInUpOTP() {
   const [email, setEmail] = useState("");
   const [success, setSuccess] = useState(false);
+  const [signInMethod, setSignInMethod] = useState<"otp" | "login" | "signup">("otp");
 
-  async function LogIn() {
+  async function HandleLogIn() {
     if (!email) {
       alert("Email is required, unfortunately.");
       return;
@@ -64,31 +66,43 @@ export default function SignInUpOTP() {
   return (
     <div className="flex items-center justify-center h-screen">
       <div className="bg-white p-6 rounded shadow-lg w-full sm:w-96">
-        <h2 className="text-2xl mb-4">Login or Create an Account</h2>
-        <div className="mb-4">
-          <label
-            htmlFor="email"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Email
-          </label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 h-12 px-3 sm:text-sm"
-            placeholder="John@doe.ca"
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </div>
+        {signInMethod === "otp" ? (
+          <>
+            <h2 className="text-2xl mb-4">Login or Create an Account</h2>
+            <div className="mb-4">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Email
+              </label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 h-12 px-3 sm:text-sm"
+                placeholder="John@doe.ca"
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
 
-        <button
-          onClick={() => LogIn()} // Pass the event argument to the LogIn function
-          type="submit"
-          className="w-full bg-indigo-500 text-white py-2 px-4 rounded-md hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-        >
-          Submit
-        </button>
+            <button
+              onClick={() => HandleLogIn()} // Pass the event argument to the LogIn function
+              type="submit"
+              className="w-full bg-indigo-500 text-white py-2 px-4 rounded-md hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+            >
+              Submit
+            </button>
+            <button
+            onClick={() => alert('Sign in with password clicked')} // Define your password login functionality here
+            className="mt-4 text-indigo-500 hover:text-indigo-600 focus:outline-none"
+          >
+            Use Password Instead?
+          </button>
+          </>
+        ) : (
+          <LogIn/>
+        )}
       </div>
     </div>
   );

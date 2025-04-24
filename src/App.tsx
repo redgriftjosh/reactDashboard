@@ -20,19 +20,20 @@ import AddDashboard from "./lib/pages/dashboards/addDashboard";
 // import ViewDashboard from "./lib/pages/dashboards/viewDashboard";
 import "./customStyles.css";
 import ViewDashboard1 from "./lib/pages/dashboards/viewDashboard copy";
-import { supabase } from "./lib/helper/supabaseClient";
+// import { supabase } from "./lib/helper/supabaseClient";
 
 //prettier-ignore
 const App = () => {
   const { user, loading } = useFetchUser();
   useFetchCompany();
-  test();
-  async function test() {
-    const { data, error } = await supabase
-    .from('companies')
-    .select()
-    console.log("companies: ", data);
-  }
+  console.log("User: ", user);
+  // test();
+  // async function test() {
+  //   const { data, error } = await supabase
+  //   .from('companies')
+  //   .select()
+  //   console.log("companies: ", data);
+  // }
 
   // console.log("Redirect", import.meta.env.VITE_EMAIL_REDIRECT_URL);
 
