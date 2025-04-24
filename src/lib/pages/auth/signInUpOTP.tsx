@@ -16,9 +16,9 @@ export default function SignInUpOTP() {
     const { data, error } = await supabase.auth.signInWithOtp({
       email: email,
       options: {
-        // emailRedirectTo: "http://tpi-3-dashboard.com/",
+        emailRedirectTo: "http://tpi-3-dashboard.com/",
         // emailRedirectTo: "http://localhost:5173/",
-        emailRedirectTo: import.meta.env.VITE_EMAIL_REDIRECT_URL,
+        // emailRedirectTo: import.meta.env.VITE_EMAIL_REDIRECT_URL,
       },
     });
     console.log(data, error);
